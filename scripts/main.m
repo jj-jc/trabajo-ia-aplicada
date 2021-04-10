@@ -29,7 +29,7 @@ for i=1:N
     image_n(:,i)=(Trainnumbers.image(:,i)-mean_image)./std_image; % data normalized
 end
 
-% Reduction the dimension of the characteristic with PCA method
+% Reduction of the dimension of the characteristics with PCA method
 [image_trans, transMat] = processpca(image_n,0.001);
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 
@@ -47,14 +47,14 @@ figure;
 imshow([imagen(image_n(:,1)),imagen(anspcan(:,1))]);
 
 % k-nn classifier
-% mdl_knn = fitcknn(image_trans',Trainnumbers.label','NumNeighbors',5,'Standardize',1);
-% pred_knn = predict(mdl_knn,image_trans');
-% num_errores_knn=length(find(pred_knn'~=Trainnumbers.label));
+mdl_knn = fitcknn(image_trans',Trainnumbers.label','NumNeighbors',5,'Standardize',1);
+pred_knn = predict(mdl_knn,image_trans');
+num_errores_knn=length(find(pred_knn'~=Trainnumbers.label));
 
 % Bayes classifier
-mdl_bayes = fitcnb(image_trans',Trainnumbers.label');
-pred_bayes = predict(mdl_bayes,image_trans');
-num_errores_bayes=length(find(pred_bayes'~=Trainnumbers.label));
+% mdl_bayes = fitcnb(image_trans',Trainnumbers.label');
+% pred_bayes = predict(mdl_bayes,image_trans');
+% num_errores_bayes=length(find(pred_bayes'~=Trainnumbers.label));
 
 
 
