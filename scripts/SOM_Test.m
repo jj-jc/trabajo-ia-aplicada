@@ -13,3 +13,6 @@ num_errores_test_SOM = length(find(SOM_pred_test~=Trainnumbers.label));
 pred_rate_SOM_Test = (length(Trainnumbers.label)-num_errores_test_SOM)/length(Trainnumbers.label);
 
 SOM_vis_Mat = reshape(SOM_Matrix,[30,30]);
+% Confusion matrix
+C = confusionmat(SOM_pred_test', Trainnumbers.label);
+confusionchart(C);

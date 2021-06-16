@@ -83,14 +83,6 @@ test_pca = transMat.inverseTransform'*test_n;
 % Reconstruction of the images
 anspcan=transMat.transform'*image_trans;
 
-% Desnormalization
-for i=1:N
-    anspca(:,i)=anspcan(:,i).*std_image+mean_image;
-end
-
-% Comparison between the original and reconstructed images
-figure
-imshow([imagen(Training_Set.image(:,1)),imagen(anspca(:,1))]);
 figure;
 imshow([imagen(image_n(:,1)),imagen(anspcan(:,1))]);
 % Comparison between the original and reconstructed images
