@@ -22,16 +22,18 @@ image_n = zeros(D,N);
 for i=1:N
     image_n(:,i)=(Training_Set.image(:,i)-mean_image)./std_image; % data normalized
 end
-% image_n = Training_Set.image;
 
-% %Normalization of the Testing Set (Same functionality
-% [test_n,ps1] = mapstd(Testing_Set.image);
-% [xTrainImages,tTrain] = digitTrainCellArrayData;
+%% PCA
+% Reduction of the dimension of the characteristics with PCA method
+[image_trans, transMat] = processpca(image_n,0.004);
 
+% Reconstruction of the images
+anspcan=transMat.transform'*image_trans;
+% the dimensionality has been reduced to dim: 55 
 %% Autocencoder
 % Parameters
-hiddensize = 150;
-epochs = 400;% epoch = 200-400
+hiddensize = 25;
+epochs = 100;% epoch = 200-400
 rng('default')
 % Training
 % L2WeightRegularization: controls the impact of an L2 regularizer for the
@@ -45,7 +47,7 @@ autoencoder = trainAutoencoder(image_n, hiddensize, ...
 'EncoderTransferFunction', 'satlin', ...
 'DecoderTransferFunction', 'purelin', ...
 'MaxEpochs' , epochs, ...
-'L2WeightRegularization',0.0001, ...
+'L2WeightRegularization',0.001, ...
 'SparsityRegularization',4,...
 'SparsityProportion',0.1, ...
 'ScaleData', false);
@@ -65,19 +67,26 @@ figure()
 
 plotWeights(autoencoder);
 figure()
-for i = 1:9
-    subplot(3,3,i);
-    imshow([imagen(image_n(:,i))]);
-end
+% for i = 1:9
+%     subplot(3,3,i);
+%     imshow([imagen(image_n(:,i))]);
+% end
 
-figure()
-for i = 1:9
-    subplot(3,3,i);
-    imshow([imagen(output(:,i))]);
-end
 
+for i = 1:9
+    figure()
+    imshow([imagen(image_n(:,i)), imagen(output(:,i)), imagen(anspcan(:,i))]);
+end
 % Error calculation
-mseError = mse(image_n-output);
+mseError_autoencoder = mse(image_n-output);
+
+%%PC
+[image_trans, transMat] = processpca(image_n,0.004);
+
+% Reconstruction of the images
+anspcan=transMat.transform'*image_trans;
+% Error calculation
+mseError_pca = mse(image_n-anspcan);
 
 
 
