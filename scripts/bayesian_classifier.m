@@ -36,7 +36,7 @@ for i=1:N
     image_n(:,i)=(Training_Set.image(:,i)-mean_image)./std_image; % data normalized
 end
 
-%Normalization of the Testing Set (Same functionality
+%Normalization of the Testing Set (Same functionality)
 [test_n,ps1] = mapstd(Testing_Set.image);
 % Reduction of the dimension of the characteristics with PCA method
 [image_trans, transMat] = processpca(image_n,0.0045);
@@ -46,6 +46,7 @@ test_pca = transMat.inverseTransform'*test_n;
 
 % Reconstruction of the images
 anspcan=transMat.transform'*image_trans;
+test_reconstructed=transMat.transform'*test_pca;
 
 % Denormalization
 for i=1:N
@@ -77,6 +78,13 @@ end
 %     %err_bay(i+1) = length(find((pred_bayes'~=Testing_Set.label) & (Testing_Set.label == i)));
 %     %err_bay_2(i+1) = length(find((pred_bayes'~=Testing_Set.label) & (pred_bayes' == i)));
 % end
+
+MSE_training = immse(anspcan, image_n);
+MSE_test = immse(test_reconstructed, test_n);
 pred_rate_bayes = (length(Testing_Set.label)-num_errores_bayes)/length(Testing_Set.label);
+
+% Confusion matrix
+C = confusionmat(pred_bayes', Testing_Set.label);
+confusionchart(C);
 
 

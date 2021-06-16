@@ -32,6 +32,45 @@ image_n = zeros(D,N);
 for i=1:N
     image_n(:,i)=(Training_Set.image(:,i)-mean_image)./std_image; % data normalized
 end
+dimensionality = ones(1,100);
+MSE_training = ones(1,100);
+% MSE_test = immse(test_reconstructed, test_n);
+for i=1:100
+    %Normalization of the Testing Set (Same functionality
+    [test_n,ps1] = mapstd(Testing_Set.image);
+    % Reduction of the dimension of the characteristics with PCA method
+    [image_trans, transMat] = processpca(image_n,(i*0.001));
+    %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
+    test_pca = transMat.inverseTransform'*test_n;
+    
+
+    % Reconstruction of the images
+    anspcan=transMat.transform'*image_trans;
+    
+    % Desnormalization
+    for j=1:N
+        anspca(:,i)=anspcan(:,i).*std_image+mean_image;
+    end
+    
+    dimensionality(i)=transMat.yrows;
+    MSE_training(i)=immse(anspcan, image_n);
+    
+    if ((i == 1) || (i == 50) || (i == 99))
+        transMat.yrows
+        figure;
+        title(['Imagen original frente imagen reconstruida (Dimensionalidad: ', num2str(transMat.yrows),')'] )
+        imshow([imagen(Training_Set.image(:,1)),imagen(anspca(:,1))]);
+        figure;
+        title(['Imagen original normalizada frente imagen reconstruida normalizada (Dimensionalidad: ', num2str(transMat.yrows),')' ])
+        imshow([imagen(image_n(:,1)),imagen(anspcan(:,1))]);
+    end 
+    
+
+end
+
+plot(dimensionality, MSE_training)
+xlabel('Dimensionalidad de las características reducidas') 
+ylabel('Error cuadrático medio') 
 
 %Normalization of the Testing Set (Same functionality
 [test_n,ps1] = mapstd(Testing_Set.image);
@@ -49,33 +88,9 @@ for i=1:N
     anspca(:,i)=anspcan(:,i).*std_image+mean_image;
 end
 
-% MSE of the PCA process
-MSE= immse(anspcan, image_n);
-
 % Comparison between the original and reconstructed images
+figure
 imshow([imagen(Training_Set.image(:,1)),imagen(anspca(:,1))]);
 figure;
 imshow([imagen(image_n(:,1)),imagen(anspcan(:,1))]);
-
-% k-nn classifier
-mdl_knn = fitcknn(image_trans',Training_Set.label','NumNeighbors',3,'Standardize',1);
-pred_knn = predict(mdl_knn,test_pca');
-num_errores_knn=length(find(pred_knn'~=Testing_Set.label));
-
-for i=0:9
-    err_knn(i+1) = length(find((pred_knn'~=Testing_Set.label) & (Testing_Set.label == i)));
-    err_knn_2(i+1) = length(find((pred_knn'~=Testing_Set.label) & (pred_knn' == i))) ;
-end
-pred_rate_knn = (length(Testing_Set.label)-num_errores_knn)/length(Testing_Set.label);
-
-% Bayes classifier
-mdl_bayes = fitcnb(image_trans',Training_Set.label');
-pred_bayes = predict(mdl_bayes,test_pca');
-num_errores_bayes=length(find(pred_bayes'~=Testing_Set.label));
-for i=0:9
-    err_bay(i+1) = length(find((pred_bayes'~=Testing_Set.label) & (Testing_Set.label == i)));
-end
-pred_rate_bayes = (length(Testing_Set.label)-num_errores_bayes)/length(Testing_Set.label);
-
-
-
+% Comparison between the original and reconstructed images

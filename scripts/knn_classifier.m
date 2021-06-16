@@ -42,10 +42,11 @@ end
 [image_trans, transMat] = processpca(image_n,0.0042);
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 test_pca = transMat.inverseTransform'*test_n;
-
+% test_pca2 = processpca(image_n,0.0042);transMat.inverseTransform'*test_n;
 
 % Reconstruction of the images
 anspcan=transMat.transform'*image_trans;
+test_reconstructed=transMat.transform'*test_pca;
 
 % Desnormalization
 for i=1:N
@@ -66,6 +67,12 @@ for i=0:9
         for j=0:9
             err_knn(i+1,j+1) = length(find((pred_knn'~=Testing_Set.label) & (Testing_Set.label == i) & (pred_knn' == j)));
         end
-    end
+end
+    
+MSE_training = immse(anspcan, image_n);
+MSE_test = immse(test_reconstructed, test_n);
 pred_rate_knn = (length(Testing_Set.label)-num_errores_knn)/length(Testing_Set.label);
 
+% Confusion matrix
+C = confusionmat(pred_knn', Testing_Set.label);
+confusionchart(C);

@@ -6,7 +6,7 @@
 %clc, clear
 
 % Load the data
-load('net.mat')
+load('SOM_net.mat')
 load ../data/Trainnumbers.mat
 Indexes = randperm(10000);
 Training_Set.image = Trainnumbers.image(:,Indexes(1:8000));
@@ -98,3 +98,6 @@ end
 num_errores_test_SOM = length(find(SOM_pred_test~=Testing_Set.label));
 pred_rate_SOM_Test = (length(Testing_Set.label)-num_errores_test_SOM)/length(Testing_Set.label);
 
+% Confusion matrix
+C = confusionmat(SOM_pred', Testing_Set.label);
+confusionchart(C);
