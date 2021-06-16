@@ -36,12 +36,15 @@ for i=1:N
     image_n(:,i)=(Training_Set.image(:,i)-mean_image)./std_image; % data normalized
 end
 
-%Normalization of the Testing Set (Same functionality
+%Normalization of the Testing Set (Same functionality)
 [test_n,ps1] = mapstd(Testing_Set.image);
+
 % Reduction of the dimension of the characteristics with PCA method
 [image_trans, transMat] = processpca(image_n,0.0042);
+
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 test_pca = transMat.inverseTransform'*test_n;
+
 % test_pca2 = processpca(image_n,0.0042);transMat.inverseTransform'*test_n;
 
 % Reconstruction of the images
