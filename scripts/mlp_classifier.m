@@ -67,8 +67,3 @@ plotconfusion(Testing_Set.label,ans_test)
 performance_test = (2000-num_errors_test)/2000;
 performance_train = (8000-num_errors_train)/8000;
 [c,cm]=confusion(Testing_Set.label,ans_test);
-
-
-
-
-
