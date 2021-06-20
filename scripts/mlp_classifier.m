@@ -11,10 +11,10 @@ for i=1:10000
 end
 
 Indexes = randperm(10000);
-Training_Set.image = Trainnumbers.image(:,Indexes(1:9000));
-Training_Set.label = digits_label(:,Indexes(1:9000));
-Testing_Set.image = Trainnumbers.image(:,Indexes(9001:end));
-Testing_Set.label = digits_label(:,Indexes(9001:end));
+Training_Set.image = Trainnumbers.image(:,Indexes(1:8000));
+Training_Set.label = digits_label(:,Indexes(1:8000));
+Testing_Set.image = Trainnumbers.image(:,Indexes(8001:end));
+Testing_Set.label = digits_label(:,Indexes(8001:end));
 
 % Normalization of the learning data
 [D,N] = size(Training_Set.image);
@@ -40,7 +40,7 @@ test_pca = transMat.inverseTransform'*test_n;
 % MLP Classifier
 
 % MLP BUILDING 
-net = feedforwardnet(10);
+net = feedforwardnet([100, 50]);
 %net = newff(image_trans,Training_Set.label,100);
 net.trainParam.epochs=100;
 %net.trainFcn = 'trainlm';
