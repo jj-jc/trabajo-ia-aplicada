@@ -1,6 +1,6 @@
 %SOM Test
 clc, clear
-load('SOM_35x35_9385.mat','SOM_Classes','net','Testing_Set','dim','N','classes_test','transMat');
+load('SOM_25x25_9265.mat','SOM_Classes','net','Testing_Set','dim','N','test_pca','transMat');
 load ../data/Trainnumbers.mat
 load ../data/Test_numbers_HW1.mat
 %load Trainnumbers.mat
@@ -35,10 +35,13 @@ for i=1:length(SOM_Classes)
         end
     end
 end
-
+tic
+y_test = net(test_pca);
+classes_test = vec2ind(y_test);
 for i=1:10000-N
     SOM_pred_test(i) = SOM_Matrix(classes_test(i));
 end
+toc
 num_errores_test_SOM = length(find(SOM_pred_test~=Testing_Set.label));
 pred_rate_SOM_Test = (length(Testing_Set.label)-num_errores_test_SOM)/length(Testing_Set.label);
 SOM_vis_Mat = reshape(SOM_Matrix,[dim,dim]);
@@ -55,9 +58,7 @@ for i=1:dim*dim
 end
 figure;
 montage(centers_original)
-figure;
-C = confusionmat(SOM_pred_test,Testing_Set.label);
-confusionchart(C);
+
 
 test_eval_som = transMat.inverseTransform'*Test_numbers.image;
 y_eval = net(test_eval_som);
@@ -65,3 +66,13 @@ classes_eval = vec2ind(y_eval);
 for i=1:10000
     pred_test_SOM(i,1) = SOM_Matrix(classes_eval(i));
 end
+
+test_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    test_labels(SOM_pred_test(i)+1,i) = 1;
+end
+correct_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    correct_labels(Testing_Set.label(i)+1,i) = 1;
+end
+plotconfusion(correct_labels,test_labels);

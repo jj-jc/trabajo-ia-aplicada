@@ -57,8 +57,9 @@ for i=1:N
 end
 
 % Classifier
-mdl_bayes = fitcnb(image_trans',Training_Set.label','OptimizeHyperparameters','auto');
-
+tic
+mdl_bayes = fitcnb(image_trans',Training_Set.label');%,'OptimizeHyperparameters','auto');
+toc
 pred_bayes = predict(mdl_bayes,test_pca');
 
 num_errores_bayes=length(find(pred_bayes'~=Testing_Set.label));
@@ -69,6 +70,16 @@ C = confusionmat(Testing_Set.label,pred_bayes);
 cm = confusionchart(C);
 cm.ColumnSummary = 'column-normalized';
 cm.RowSummary = 'row-normalized';
+
+test_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    test_labels(pred_bayes(i)+1,i) = 1;
+end
+correct_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    correct_labels(Testing_Set.label(i)+1,i) = 1;
+end
+plotconfusion(correct_labels,test_labels);
 
 test_eval_bay = transMat.inverseTransform'*Test_numbers.image;
 pred_test_bay = predict(mdl_bayes,test_eval_bay');

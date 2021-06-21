@@ -7,10 +7,10 @@ clc, clear
 load ../data/Trainnumbers.mat
 load ../data/Test_numbers_HW1.mat
 Indexes = randperm(10000);
-Training_Set.image = Trainnumbers.image(:,Indexes(1:9000));
-Training_Set.label = Trainnumbers.label(1,Indexes(1:9000));
-Testing_Set.image = Trainnumbers.image(:,Indexes(9001:end));
-Testing_Set.label = Trainnumbers.label(:,Indexes(9001:end));
+Training_Set.image = Trainnumbers.image(:,Indexes(1:8000));
+Training_Set.label = Trainnumbers.label(:,Indexes(1:8000));
+Testing_Set.image = Trainnumbers.image(:,Indexes(8001:end));
+Testing_Set.label = Trainnumbers.label(:,Indexes(8001:end));
 % Divide the images in their corresponding class
 class_0 = Training_Set.image(:,(Training_Set.label==0));
 class_1 = Training_Set.image(:,(Training_Set.label==1));
@@ -60,8 +60,22 @@ end
 
 % k-nn classifier
 %mdl_knn =fitcknn(image_trans',Training_Set.label','OptimizeHyperparameters','auto')
-mdl_knn = fitcknn(image_trans',Training_Set.label','NumNeighbors',3,'Standardize',1);
+
+load('autoenc.mat');
+% % % % % Autoencoder
+% % % % % feat1 = encode(autoenc1,image_n);
+% % % % % feat1_test = encode(autoenc1,test_n);
+% % % % % feat2 = encode(autoenc2,feat1);
+% % % % % feat2_test = encode(autoenc2,feat1_test);
+% % % % % 
+% % % % % mdl_knn = fitcknn(feat1',Training_Set.label','NumNeighbors',3,'Standardize',1);
+% % % % % pred_knn = predict(mdl_knn,feat1_test');
+% % % % % pred_train = predict(mdl_knn,feat1');
+tic
+mdl_knn = fitcknn(image_trans',Training_Set.label','NumNeighbors',5,'Standardize',1,'Distance','cosine');
+toc
 pred_knn = predict(mdl_knn,test_pca');
+
 pred_train = predict(mdl_knn,image_trans');
 num_errores_knn=length(find(pred_knn'~=Testing_Set.label));
 num_err_train = length(find(pred_train'~=Training_Set.label));
@@ -69,10 +83,15 @@ num_err_train = length(find(pred_train'~=Training_Set.label));
 pred_rate_knn = (length(Testing_Set.label)-num_errores_knn)/length(Testing_Set.label);
 pred_rate_train = (length(Training_Set.label)-num_err_train)/length(Training_Set.label);
 
-C = confusionmat(Testing_Set.label,pred_knn);
-cm = confusionchart(C);
-cm.ColumnSummary = 'column-normalized';
-cm.RowSummary = 'row-normalized';
 
-test_eval_knn = transMat.inverseTransform'*Test_numbers.image;
-pred_test_knn = predict(mdl_knn,test_eval_knn');
+test_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    test_labels(pred_knn(i)+1,i) = 1;
+end
+correct_labels = zeros(10, 10000-N);
+for i=1:10000-N
+    correct_labels(Testing_Set.label(i)+1,i) = 1;
+end
+plotconfusion(correct_labels,test_labels);
+%test_eval_knn = transMat.inverseTransform'*Test_numbers.image;
+%pred_test_knn = predict(mdl_knn,test_eval_knn');

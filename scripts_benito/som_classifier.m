@@ -60,9 +60,9 @@ end
 
 % Classifier
 
-dim = 35;
+dim = 25;
 net = selforgmap([dim dim]);
-net.trainParam.epochs=300;
+net.trainParam.epochs=400;
 net = train(net,image_trans);
 
 %view(net)
@@ -87,7 +87,7 @@ for i=1:length(SOM_Classes)
     %Si encuentra repetido el máximo, escoge el que tome el mismo valor
     %que el dato anterior (vecindad)
     %Si ninguno de los máximos coincide con el anterior, escoge el primero
-    %que salga (lo suyo sería también comprobar el posterior
+    %que salga 
     if(length(max_indexes)>1 && i~=1)
         for j=1:length(max_indexes)
             if(mod(i,dim)~=1)

@@ -57,9 +57,9 @@ end
 
 % Classifier
 
-dim = 30;
+dim = 25;
 net = selforgmap([dim dim]);
-net.trainParam.epochs=800;
+net.trainParam.epochs=400;
 net = train(net,image_trans);
 
 %view(net)
