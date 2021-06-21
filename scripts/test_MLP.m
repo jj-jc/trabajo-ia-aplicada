@@ -3,7 +3,7 @@ clc, clear
 load('transMat_MLP_100-50neurons.mat');
 load('MLP_100-50neurons.mat');
 load('../resultados/Test_numbers_HW1.mat');
-
+load ../data/Trainnumbers.mat
 % Se crea una matriz 10x10000 para establecer la clase a la que pertenece
 % cada dígito del dataset
 digits_label = zeros(10,10000);
@@ -18,7 +18,9 @@ end
 test_pca = transMat.inverseTransform'*test_n;
 
 % Se obtiene la clasificación de los datos con la red neuronal
+tic
 ans_test=net(test_pca);
+toc
 % Se pasa a una matriz 1x10000 los resultados de la clasificacion
 ans_test_normalized = vec2ind(ans_test);
 resultados_clasificacion = ans_test_normalized - ones(1,10000);
