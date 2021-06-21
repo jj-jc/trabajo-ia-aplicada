@@ -5,6 +5,7 @@ clc, clear
 
 % Load the data
 load ../data/Trainnumbers.mat
+load ../data/Test_numbers_HW1.mat
 Indexes = randperm(10000);
 Training_Set.image = Trainnumbers.image(:,Indexes(1:8000));
 Training_Set.label = Trainnumbers.label(1,Indexes(1:8000));
@@ -64,4 +65,10 @@ num_errores_bayes=length(find(pred_bayes'~=Testing_Set.label));
 
 pred_rate_bayes = (length(Testing_Set.label)-num_errores_bayes)/length(Testing_Set.label);
 
+C = confusionmat(Testing_Set.label,pred_bayes);
+cm = confusionchart(C);
+cm.ColumnSummary = 'column-normalized';
+cm.RowSummary = 'row-normalized';
 
+test_eval_bay = transMat.inverseTransform'*Test_numbers.image;
+pred_test_bay = predict(mdl_bayes,test_eval_bay');

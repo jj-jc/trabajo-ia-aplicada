@@ -1,7 +1,8 @@
 %SOM Test
 clc, clear
-load('net25x252.mat','SOM_Classes','net','Testing_Set','dim','N','classes_test','transMat');
+load('SOM_35x35_9385.mat','SOM_Classes','net','Testing_Set','dim','N','classes_test','transMat');
 load ../data/Trainnumbers.mat
+load ../data/Test_numbers_HW1.mat
 %load Trainnumbers.mat
 load('Colormap1.mat');
 for i=1:length(SOM_Classes)
@@ -57,3 +58,10 @@ montage(centers_original)
 figure;
 C = confusionmat(SOM_pred_test,Testing_Set.label);
 confusionchart(C);
+
+test_eval_som = transMat.inverseTransform'*Test_numbers.image;
+y_eval = net(test_eval_som);
+classes_eval = vec2ind(y_eval);
+for i=1:10000
+    pred_test_SOM(i,1) = SOM_Matrix(classes_eval(i));
+end

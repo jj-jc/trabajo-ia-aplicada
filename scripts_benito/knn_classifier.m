@@ -5,11 +5,12 @@ clc, clear
 
 % Load the data
 load ../data/Trainnumbers.mat
+load ../data/Test_numbers_HW1.mat
 Indexes = randperm(10000);
-Training_Set.image = Trainnumbers.image(:,1:8000);%Indexes(1:8000));
-Training_Set.label = Trainnumbers.label(1,1:8000);%Indexes(1:8000));
-Testing_Set.image = Trainnumbers.image(:,8001:10000);%Indexes(1:8000));
-Testing_Set.label = Trainnumbers.label(:,8001:10000);%Indexes(1:8000));
+Training_Set.image = Trainnumbers.image(:,Indexes(1:9000));
+Training_Set.label = Trainnumbers.label(1,Indexes(1:9000));
+Testing_Set.image = Trainnumbers.image(:,Indexes(9001:end));
+Testing_Set.label = Trainnumbers.label(:,Indexes(9001:end));
 % Divide the images in their corresponding class
 class_0 = Training_Set.image(:,(Training_Set.label==0));
 class_1 = Training_Set.image(:,(Training_Set.label==1));
@@ -39,7 +40,7 @@ end
 %Normalization of the Testing Set (Same functionality
 [test_n,ps1] = mapstd(Testing_Set.image);
 % Reduction of the dimension of the characteristics with PCA method
-[image_trans, transMat] = processpca(Training_Set.image,0.0045);
+[image_trans, transMat] = processpca(Training_Set.image,0.0042);
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 test_pca = transMat.inverseTransform'*Testing_Set.image;
 
@@ -58,7 +59,8 @@ end
 %imshow([imagen(image_n(:,1)),imagen(anspcan(:,1))]);
 
 % k-nn classifier
-mdl_knn =fitcknn(image_trans',Training_Set.label','OptimizeHyperparameters','auto')%,'NumNeighbors',3,'Standardize',1);
+%mdl_knn =fitcknn(image_trans',Training_Set.label','OptimizeHyperparameters','auto')
+mdl_knn = fitcknn(image_trans',Training_Set.label','NumNeighbors',3,'Standardize',1);
 pred_knn = predict(mdl_knn,test_pca');
 pred_train = predict(mdl_knn,image_trans');
 num_errores_knn=length(find(pred_knn'~=Testing_Set.label));
@@ -66,3 +68,11 @@ num_err_train = length(find(pred_train'~=Training_Set.label));
 
 pred_rate_knn = (length(Testing_Set.label)-num_errores_knn)/length(Testing_Set.label);
 pred_rate_train = (length(Training_Set.label)-num_err_train)/length(Training_Set.label);
+
+C = confusionmat(Testing_Set.label,pred_knn);
+cm = confusionchart(C);
+cm.ColumnSummary = 'column-normalized';
+cm.RowSummary = 'row-normalized';
+
+test_eval_knn = transMat.inverseTransform'*Test_numbers.image;
+pred_test_knn = predict(mdl_knn,test_eval_knn');

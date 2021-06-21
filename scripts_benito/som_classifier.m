@@ -45,7 +45,7 @@ end
 %Normalization of the Testing Set (Same functionality
 [test_n,ps1] = mapstd(Testing_Set.image);
 % Reduction of the dimension of the characteristics with PCA method
-[image_trans, transMat] = processpca(Training_Set.image,0.0045);
+[image_trans, transMat] = processpca(Training_Set.image,0.0040);
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 test_pca = transMat.inverseTransform'*Testing_Set.image;
 
@@ -60,9 +60,9 @@ end
 
 % Classifier
 
-dim = 30;
+dim = 35;
 net = selforgmap([dim dim]);
-net.trainParam.epochs=400;
+net.trainParam.epochs=300;
 net = train(net,image_trans);
 
 %view(net)
