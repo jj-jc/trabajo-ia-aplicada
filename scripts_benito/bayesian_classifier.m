@@ -43,29 +43,34 @@ end
 %Normalization of the Testing Set (Same functionality
 [test_n,ps1] = mapstd(Testing_Set.image);
 % Reduction of the dimension of the characteristics with PCA method
-[image_trans, transMat] = processpca(Training_Set.image,0.0045);
+[image_trans, transMat] = processpca(Training_Set.image,0.0015);
 %[image_trans, transMat] = processpca(Trainnumbers.image,0.001); no normalized
 test_pca = transMat.inverseTransform'*Testing_Set.image;
 
 
-% Reconstruction of the images
-anspcan=transMat.transform'*image_trans;
+load('autoenc_4.mat');
+%Autoencoder
+feat1 = encode(autoenc1,image_n);
+feat1_test = encode(autoenc1,test_n);
+feat2 = encode(autoenc2,feat1);
+feat2_test = encode(autoenc2,feat1_test);
 
-% Denormalization
-for i=1:N
-    anspca(:,i)=anspcan(:,i).*std_image+mean_image;
-end
+mdl_bayes = fitcnb(feat1',Training_Set.label');
+pred_bayes = predict(mdl_bayes,feat1_test');
+pred_train = predict(mdl_bayes,feat1');
+
 
 % Classifier
-tic
-mdl_bayes = fitcnb(image_trans',Training_Set.label');%,'OptimizeHyperparameters','auto');
-toc
-pred_bayes = predict(mdl_bayes,test_pca');
+
+%mdl_bayes = fitcnb(image_trans',Training_Set.label');%,'OptimizeHyperparameters','auto');
+
+% pred_bayes = predict(mdl_bayes,test_pca');
+% pred_train = predict(mdl_bayes,image_trans');
 
 num_errores_bayes=length(find(pred_bayes'~=Testing_Set.label));
-
+num_err_train = length(find(pred_train'~=Training_Set.label));
 pred_rate_bayes = (length(Testing_Set.label)-num_errores_bayes)/length(Testing_Set.label);
-
+pred_rate_train = (length(Training_Set.label)-num_err_train)/length(Training_Set.label);
 C = confusionmat(Testing_Set.label,pred_bayes);
 cm = confusionchart(C);
 cm.ColumnSummary = 'column-normalized';
@@ -81,5 +86,7 @@ for i=1:10000-N
 end
 plotconfusion(correct_labels,test_labels);
 
-test_eval_bay = transMat.inverseTransform'*Test_numbers.image;
+[eval_n,ps1] = mapstd(Test_numbers.image);
+
+test_eval_bay = encode(autoenc1,eval_n);
 pred_test_bay = predict(mdl_bayes,test_eval_bay');
