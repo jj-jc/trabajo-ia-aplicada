@@ -2,7 +2,7 @@ clc, clear
 
 load('transMat_MLP_100-50neurons.mat');
 load('MLP_100-50neurons.mat');
-load('../data/Trainnumbers.mat');
+load('../resultados/Test_numbers_HW1.mat');
 
 % Se crea una matriz 10x10000 para establecer la clase a la que pertenece
 % cada dígito del dataset
