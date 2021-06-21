@@ -69,8 +69,8 @@
 % %% Load the data
 load ../data/Trainnumbers.mat
 Indexes = randperm(10000);
-Training_Set.image = Trainnumbers.image(:,Indexes(1:8000));
-Training_Set.label = Trainnumbers.label(1,Indexes(1:8000));
+Training_Set.image = Trainnumbers.image(:,(1:8000));
+Training_Set.label = Trainnumbers.label(:,(1:8000));
 Testing_Set.image = Trainnumbers.image(:,Indexes(8001:end));
 Testing_Set.label = Trainnumbers.label(:,Indexes(8001:end));
 
@@ -78,7 +78,8 @@ Testing_Set.label = Trainnumbers.label(:,Indexes(8001:end));
 [test_n,ps1] = mapstd(Testing_Set.image);
 %first autoencoder
 rng('default')
-hiddenSize1 = 100;
+
+hiddenSize1 = 160;
 autoenc1 = trainAutoencoder(image_n,hiddenSize1, ...
     'MaxEpochs',400, ...
     'L2WeightRegularization',0.004, ...
@@ -90,7 +91,7 @@ figure()
 plotWeights(autoenc1);
 feat1 = encode(autoenc1,image_n);
 %Second autoencoder
-hiddenSize2 = 50;
+hiddenSize2 = 60;
 autoenc2 = trainAutoencoder(feat1,hiddenSize2, ...
     'MaxEpochs',100, ...
     'L2WeightRegularization',0.002, ...
@@ -117,9 +118,13 @@ end
 softnet = trainSoftmaxLayer(feat2, training_labels,'MaxEpochs',400);
 stackednet = stack(autoenc1,autoenc2,softnet);
 view(stackednet)
+
 y = stackednet(test_n);
+
 plotconfusion(test_labels,y);
 % backpropagation
+
 stackednet = train(stackednet, image_n, training_labels);
+
 y = stackednet(test_n);
 plotconfusion(test_labels,y);
